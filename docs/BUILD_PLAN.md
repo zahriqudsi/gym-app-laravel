@@ -92,14 +92,16 @@ backend/
 - **Reminder pipeline** end-to-end (command → dedupe → queue → job → gateway →
   logged), idempotent, quiet-hours aware.
 - **Nightly schedule** wired in `routes/console.php`.
-- **Filament admin** with a Members list (status badges, filters) and Plans
-  editor (rupee inputs), plus a dashboard stats widget.
+- **Filament admin** — Phase 1 is built (see §4): members, plans, sell/renew,
+  payments, invoices, dues ageing, cash sessions, check-in, reminders +
+  templates + delivery logs + broadcast SMS, dashboard charts, editable
+  settings, staff, CSV member import. Receipt/invoice PDFs.
 - **Seeder** that generates a realistic demo gym by calling the real services.
 - **Feature tests** for billing allocation, tax split, renewals, and the
   access-decision matrix.
 
-This is roughly "Phase 1 foundation". The list below is what turns it into a
-sellable MVP.
+Phase 1 (the sellable MVP) is largely in place. §4 lists what's built and the
+gaps still open; Phase 2 below is the growth backlog.
 
 ---
 
@@ -108,35 +110,43 @@ sellable MVP.
 Each item = a Filament resource / page + any service methods + tests.
 Recommended order for a solo build; ship after Phase 1.
 
-### Phase 1 — core operations (MVP)
+### Phase 1 — core operations (MVP) — ✅ built
 
-1. **Members** — *scaffolded.* Add: photo upload, document uploads,
-   duplicate-phone/NIC warning, a "Membership" relation-manager showing the
-   member's terms, an activity timeline, quick actions (Renew, Record payment,
-   Freeze).
-2. **Plans** — *scaffolded.* Add discount codes later.
-3. **Sell / renew flow** — a Filament page or action wrapping
-   `BillingService::sellMembership()` + immediate `recordPayment()`.
-   Print/download the receipt (see §8, PDFs).
-4. **Payments & dues** — `PaymentResource` (list, filters by method/date),
-   a "Record payment" action from a member, an **Invoices** resource with a
-   dues/ageing view. Refunds & credit notes.
-5. **Cash session / day close** — open float, list payments by method,
-   expected vs counted, variance, print summary. `CashSession` model exists.
-6. **Attendance / check-in** — a dedicated fast page: search by phone/QR,
-   call `accessDecision()`, show green/amber/red, write `Attendance`.
-   Add a "who's in now" list.
-7. **Reminders admin** — `ReminderRuleResource`, `MessageTemplateResource`,
-   a "send test" action, a delivery log view (from `notification_logs` /
-   `sms_messages`). Bulk/broadcast SMS to a filtered member set.
-8. **Owner dashboard** — extend `GymOverview`; add charts (revenue by day,
-   new vs expired) with Filament chart widgets; a "renewals due this week" table.
-9. **Settings** — move `config/gym.php` values into an editable settings page
-   (gym profile, tax, reminder timing, receipt header).
-10. **Staff & roles** — `UserResource`, assign Spatie roles, gate Filament
-    resources/actions by permission (`filament-shield` optional).
-11. **Data import** — a CSV importer for existing members + opening dues
-    (Filament has `Importer` classes). Produce a reconciliation summary.
+1. **Members** — ✅ list with status badges/filters, form in sections,
+   Memberships relation-manager (term history + freeze/unfreeze), row +
+   header actions (Sell/Renew, Record payment). *Still to add: photo &
+   document uploads, duplicate-phone/NIC warning, activity timeline.*
+2. **Plans** — ✅ rupee inputs, duration vs session packs. *Discount codes later.*
+3. **Sell / renew flow** — ✅ `SellMembershipAction` (wraps
+   `sellMembership()` + optional `recordPayment()`); receipt & invoice PDFs
+   at `documents.receipt` / `documents.invoice` (dompdf).
+4. **Payments & dues** — ✅ `PaymentResource` (read-only, filters, receipt
+   PDF), `InvoiceResource` (outstanding filter, age column, per-invoice
+   "record payment"), **Reports → Dues ageing** page (0-30/31-60/61-90/90+
+   buckets + debtor table). *Still to add: refunds & credit notes.*
+5. **Cash session / day close** — ✅ `CashSessionResource` with open/close
+   actions; expected = float + cash collected; variance recorded; shift
+   breakdown by method. Payments auto-link to the branch's open session.
+6. **Attendance / check-in** — ✅ `CheckIn` page: search, access banner from
+   `accessDecision()`, one-tap check-in, duplicate-window guard, override,
+   check-out, "in the gym now" + "recent today".
+7. **Reminders admin** — ✅ `ReminderRuleResource` (+ "Run reminders now"),
+   `MessageTemplateResource` (+ "Send test"), `NotificationLogResource` and
+   `SmsMessageResource` (read-only logs), **Broadcast SMS** bulk action on
+   the members table (`SendAdhocSms` job).
+8. **Owner dashboard** — ✅ `GymOverview` stats + `RevenueChart` +
+   `AdmissionsChart`. *A "renewals due this week" table would be a nice add.*
+9. **Settings** — ✅ `Settings` page backed by a `settings` table; a `Setting`
+   model + an `AppServiceProvider` overlay so `config('gym.*')` reads pick up
+   edits with no other code changes.
+10. **Staff & roles** — ✅ `UserResource` ("Staff", owner/manager only).
+    *Fine-grained per-resource permission gating (filament-shield) still open.*
+11. **Data import** — ✅ `MemberImporter` + "Import CSV" action; de-dupes on
+    phone / NIC. *Opening-dues import still to do.*
+
+**Not yet done in Phase 1:** refunds/credit notes, member photo/document
+uploads, audit log (`spatie/laravel-activitylog`), PDPA consent + data-export
+/ erasure, PayHere online payments (§5), offline check-in (§6).
 
 ### Phase 2 — grow
 
