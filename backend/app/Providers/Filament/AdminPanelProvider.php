@@ -2,11 +2,13 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\AdmissionsChart;
+use App\Filament\Widgets\GymOverview;
+use App\Filament\Widgets\RevenueChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\Widgets\GymOverview;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -40,6 +42,8 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 GymOverview::class,
+                RevenueChart::class,
+                AdmissionsChart::class,
                 AccountWidget::class,
             ])
             ->middleware([
