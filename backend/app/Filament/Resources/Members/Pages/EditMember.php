@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Members\Pages;
 
+use App\Filament\Actions\RecordPaymentAction;
+use App\Filament\Actions\SellMembershipAction;
 use App\Filament\Resources\Members\MemberResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
@@ -15,6 +17,8 @@ class EditMember extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            SellMembershipAction::make(),
+            RecordPaymentAction::make(),
             DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),

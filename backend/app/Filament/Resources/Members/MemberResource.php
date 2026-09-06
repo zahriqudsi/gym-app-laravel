@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\Members;
 
+use App\Filament\Actions\RecordPaymentAction;
+use App\Filament\Actions\SellMembershipAction;
 use App\Filament\Resources\Members\Pages\CreateMember;
 use App\Filament\Resources\Members\Pages\EditMember;
 use App\Filament\Resources\Members\Pages\ListMembers;
+use App\Filament\Resources\Members\RelationManagers\MembershipsRelationManager;
 use App\Models\Member;
 use BackedEnum;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -106,7 +110,11 @@ class MemberResource extends Resource
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    SellMembershipAction::make(),
+                    RecordPaymentAction::make(),
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -115,6 +123,13 @@ class MemberResource extends Resource
                     RestoreBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            MembershipsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
