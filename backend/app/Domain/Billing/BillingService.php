@@ -75,6 +75,8 @@ class BillingService
             $invoice = $this->createInvoice($member, $lines, [
                 'branch_id' => $opts['branch_id'] ?? $member->branch_id,
                 'created_by' => $opts['created_by'] ?? auth()->id(),
+                'issued_on' => $startsOn,
+                'due_on' => $startsOn,
             ]);
 
             $membership->update(['invoice_id' => $invoice->id]);

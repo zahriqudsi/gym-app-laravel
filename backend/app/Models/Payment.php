@@ -34,6 +34,11 @@ class Payment extends Model
         return $this->belongsTo(CashSession::class);
     }
 
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function allocations(): HasMany
     {
         return $this->hasMany(PaymentAllocation::class);
