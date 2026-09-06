@@ -41,4 +41,39 @@ class CashSession extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    /** The open session for a branch, if any. */
+    public static function currentOpen(?int $branchId): ?self
+    {
+        return static::query()
+            ->where('status', 'open')
+            ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
+            ->latest('opened_at')
+            ->first();
+    }
+
+    public function cashCollectedCents(): int
+    {
+        return (int) $this->payments()
+            ->where('method', 'cash')
+            ->where('status', 'completed')
+            ->sum('amount_cents');
+    }
+
+    public function expectedCashCents(): int
+    {
+        return $this->opening_float_cents + $this->cashCollectedCents();
+    }
+
+    /** Collections during the session, keyed by method. */
+    public function breakdownByMethod(): array
+    {
+        return $this->payments()
+            ->where('status', 'completed')
+            ->selectRaw('method, SUM(amount_cents) as total')
+            ->groupBy('method')
+            ->pluck('total', 'method')
+            ->map(fn ($v) => (int) $v)
+            ->toArray();
+    }
 }

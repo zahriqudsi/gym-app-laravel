@@ -163,10 +163,16 @@ class BillingService
     public function recordPayment(?Member $member, array $data): Payment
     {
         return DB::transaction(function () use ($member, $data) {
+            $branchId = $data['branch_id'] ?? $member?->branch_id;
+
+            // Attach front-desk payments to the branch's open cash session.
+            $cashSessionId = $data['cash_session_id']
+                ?? \App\Models\CashSession::currentOpen($branchId)?->id;
+
             $payment = Payment::create([
-                'branch_id' => $data['branch_id'] ?? $member?->branch_id,
+                'branch_id' => $branchId,
                 'member_id' => $member?->id,
-                'cash_session_id' => $data['cash_session_id'] ?? null,
+                'cash_session_id' => $cashSessionId,
                 'number' => DocumentNumber::receipt(),
                 'paid_at' => isset($data['paid_at']) ? Carbon::parse($data['paid_at']) : now(),
                 'method' => $data['method'],
