@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Members;
 
+use App\Domain\Support\DocumentNumber;
 use App\Filament\Actions\BroadcastSmsBulkAction;
 use App\Filament\Actions\RecordPaymentAction;
 use App\Filament\Actions\SellMembershipAction;
@@ -56,7 +57,9 @@ class MemberResource extends Resource
     {
         return $schema->components([
             Section::make('Identity')->columns(2)->schema([
-                TextInput::make('member_no')->required()->maxLength(30),
+                TextInput::make('member_no')->required()->maxLength(30)
+                    ->default(fn () => DocumentNumber::member())
+                    ->helperText('Auto-filled with the next number — change it if your gym uses its own scheme.'),
                 Select::make('status')->options(self::STATUSES)->required()->default('enquiry'),
                 TextInput::make('first_name')->required(),
                 TextInput::make('last_name'),
