@@ -7,9 +7,12 @@ SMS renewal & payment reminders, leads. Built for one gym (optionally multiple
 branches) — NOT multi-tenant. Target market: gyms in Sri Lanka (LKR, notify.lk
 SMS, PayHere).
 
-**Read `docs/BUILD_PLAN.md` first** — it explains the architecture, conventions,
-what is scaffolded, and the module build order. `SOW_Gym_Management_System.docx`
-(repo root, or `docs/` once moved) is the full product statement of work.
+This Laravel app is the `backend/` folder of a monorepo. Sibling folders:
+`../docs/` (SOW + build plan) and, later, `../mobile/` (Flutter member app).
+
+**Read `../docs/BUILD_PLAN.md` first** — it explains the architecture,
+conventions, what is scaffolded, and the module build order.
+`../docs/SOW_Gym_Management_System.docx` is the full product statement of work.
 
 ## Conventions (do not break these)
 

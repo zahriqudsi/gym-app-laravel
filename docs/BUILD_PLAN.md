@@ -6,6 +6,10 @@ single-gym application** — one gym, optionally multiple branches — because i
 faster to ship and validate. Section 9 explains how to graduate to multi-tenant
 SaaS later without throwing this away.
 
+**Repo layout:** the Laravel app lives in `backend/`; the future Flutter member
+app will live in `mobile/`; shared docs in `docs/`. All paths below are relative
+to `backend/` unless noted.
+
 Stack: **Laravel 13 + Filament 5** (admin/back-office), **SQLite** in dev /
 **MySQL or MariaDB** in production, **Sanctum** for the future member API,
 queue + scheduler for reminders. Built for a solo developer.
@@ -15,6 +19,7 @@ queue + scheduler for reminders. Built for a solo developer.
 ## 1. Local setup
 
 ```bash
+cd backend
 cp .env.example .env
 php artisan key:generate
 php artisan migrate:fresh --seed        # demo gym + 30 members + plans + reminder rules
@@ -54,7 +59,8 @@ Everything is written to be portable (no SQLite-only SQL).
 ### Where things live
 
 ```
-app/
+backend/
+ app/
   Domain/
     Billing/            BillingService, ...
     Members/            MembershipStatusService, AccessDecision
@@ -66,7 +72,7 @@ app/
   Filament/Resources/   MemberResource, PlanResource  (admin UI)
   Filament/Widgets/     GymOverview (dashboard stats)
   Models/               18 domain models
-database/
+ database/
   migrations/           2026_09_06_0800xx_*  (domain schema)
   seeders/              DemoSeeder, RolesSeeder
 ```
@@ -144,8 +150,9 @@ Recommended order for a solo build; ship after Phase 1.
     charge to member or walk-in; low-stock alerts.
 16. **Reports** — revenue (by plan/method/branch), membership growth/retention,
     dues ageing, attendance/footfall, SMS cost. Export to Excel/PDF.
-17. **Member mobile app** — Sanctum API (`routes/api.php`) + Flutter client:
-    status, renew/pay online, digital QR card, attendance history, class booking.
+17. **Member mobile app** — Sanctum API (`backend/routes/api.php`) + a Flutter
+    client in the repo's `mobile/` folder (create it here): status, renew/pay
+    online, digital QR card, attendance history, class booking.
 18. **WhatsApp channel** — implement a `WhatsAppGateway` alongside `SmsGateway`;
     Meta Cloud API or a BSP; template approval.
 
