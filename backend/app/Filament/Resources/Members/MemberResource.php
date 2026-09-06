@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Members;
 
+use App\Filament\Actions\BroadcastSmsBulkAction;
 use App\Filament\Actions\RecordPaymentAction;
 use App\Filament\Actions\SellMembershipAction;
 use App\Filament\Resources\Members\Pages\CreateMember;
@@ -117,6 +118,7 @@ class MemberResource extends Resource
                 ]),
             ])
             ->toolbarActions([
+                BroadcastSmsBulkAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
